@@ -4,4 +4,4 @@ services:
       context: kubetools
       args:
         - BUILD_OS=linux
-        - BUILD_ARCH=amd64
+        - BUILD_ARCH=arm64

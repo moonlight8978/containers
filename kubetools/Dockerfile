@@ -3,6 +3,7 @@ FROM alpine:3.21.3 AS builder
 ARG SOPS_VERSION=v3.10.2
 ARG KUBE_VERSION=v1.32.3
 ARG HELM_VERSION=v3.17.3
+ARG KUSTOMIZE_VERSION=v5.6.0
 
 ARG BUILD_OS
 ARG BUILD_ARCH
@@ -24,6 +25,12 @@ RUN curl -LO "https://dl.k8s.io/release/${KUBE_VERSION}/bin/${BUILD_OS}/${BUILD_
 RUN curl -L "https://github.com/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.${BUILD_OS}.${BUILD_ARCH}" -o sops \
     && chmod +x sops \
     && mv sops /app/bin/
+
+RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_${BUILD_OS}_${BUILD_ARCH}.tar.gz" -o kustomize.tar.gz \
+    && tar -xvzf kustomize.tar.gz \
+    && chmod +x kustomize \
+    && mv kustomize /app/bin/ \
+    && rm kustomize.tar.gz
 
 FROM alpine:3.21.3
 
