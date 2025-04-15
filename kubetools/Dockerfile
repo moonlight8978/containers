@@ -35,7 +35,8 @@ RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kust
 FROM alpine:3.21.3
 
 RUN apk add --no-cache \
-    gnupg=2.4.7-r0
+    gnupg=2.4.7-r0 \
+    jq=1.7.1-r0
 
 RUN adduser -u 1001 -D -S alpine
 USER alpine
