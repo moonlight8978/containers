@@ -1,0 +1,4 @@
+image: "ghcr.io/moonlight8978/kubetools"
+version: 1.0.0
+arch:
+  - amd64

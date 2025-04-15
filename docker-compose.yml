@@ -1,0 +1,7 @@
+services:
+  kubetools:
+    build:
+      context: kubetools
+      args:
+        - BUILD_OS=linux
+        - BUILD_ARCH=amd64

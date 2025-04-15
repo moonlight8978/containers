@@ -1,0 +1,135 @@
+# https://github.com/home-assistant/addons-example/blob/main/.github/workflows/builder.yaml
+name: Publish containers
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  BUILD_ARGS: "--test"
+  MONITORED_FILES: "config.yaml Dockerfile"
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    name: Initialize builds
+    outputs:
+      changed_containers: ${{ steps.changed_containers.outputs.containers }}
+      changed: ${{ steps.changed_containers.outputs.changed }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed_files
+        uses: Ana06/get-changed-files@v2.3.0
+
+      - name: Find container directories
+        id: containers
+        uses: home-assistant/actions/helpers/find-addons@master
+
+      - name: Get changed containers
+        id: changed_containers
+        run: |
+          declare -a changed_containers
+          for container in ${{ steps.containers.outputs.addons }}; do
+            if [[ "$BUILD_ARGS" =~ "--force" ]]; then
+              echo "Force build for $container";
+              changed_containers+=("\"${container}\",");
+            elif [[ "${{ steps.changed_files.outputs.all }}" =~ $container ]]; then
+              for file in ${{ env.MONITORED_FILES }}; do
+                  if [[ "${{ steps.changed_files.outputs.all }}" =~ $container/$file ]]; then
+                    if [[ ! "${changed_containers[@]}" =~ $container ]]; then
+                      changed_containers+=("\"${container}\",");
+                    fi
+                  fi
+              done
+            fi
+          done
+
+          changed=$(echo ${changed_containers[@]} | rev | cut -c 2- | rev)
+
+          if [[ -n ${changed} ]]; then
+            echo "Changed containers: $changed";
+            echo "changed=true" >> $GITHUB_OUTPUT;
+            echo "containers=[$changed]" >> $GITHUB_OUTPUT;
+          else
+            echo "No container had any monitored files changed (${{ env.MONITORED_FILES }})";
+          fi
+
+  build:
+    needs: init
+    # runs-on: ${{ contains(fromJson('["armhf", "armv7", "aarch64"]'), matrix.arch) && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
+    if: needs.init.outputs.changed == 'true'
+    name: Build ${{ matrix.arch }} ${{ matrix.container }} container
+    strategy:
+      matrix:
+        container: ${{ fromJson(needs.init.outputs.changed_containers) }}
+        arch: ["amd64", "arm64"]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Get information
+        id: info
+        uses: home-assistant/actions/helpers/info@master
+        with:
+          path: "./${{ matrix.container }}"
+
+      - name: Check if add-on should be built
+        id: check
+        run: |
+          if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
+            echo "Image property is not defined, skipping build"
+            echo "build_arch=false" >> $GITHUB_OUTPUT;
+          elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
+            echo "build_arch=true" >> $GITHUB_OUTPUT;
+            echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
+            if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
+                echo "BUILD_ARGS=" >> $GITHUB_ENV;
+            fi
+          else
+            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.container }}, skipping build";
+            echo "build_arch=false" >> $GITHUB_OUTPUT;
+          fi
+
+      - name: Login to GitHub Container Registry
+        if: env.BUILD_ARGS != '--test'
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Unquote version
+        id: version
+        run: |
+          echo "value=${{ steps.info.outputs.version }}" | sed 's/^"\(.*\)"$/\1/' >> $GITHUB_OUTPUT
+
+      - name: Create docker tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.info.outputs.image }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.value }}
+
+      - name: Publish images
+        if: steps.check.outputs.build_arch == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.container }}
+          file: ./${{ matrix.container }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/${{ matrix.arch }}
+          build-args: |
+            BUILD_ARCH=${{ matrix.arch }}
+            BUILD_OS=linux
