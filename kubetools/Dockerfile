@@ -1,12 +1,12 @@
 FROM alpine:3.21.3 AS builder
 
-# renovate: datasource=github-releases depName=kubernetes/kubernetes lookupName=kubernetes/kubernetes
+# renovate: datasource=github-releases depName=kubernetes/kubernetes
 ARG KUBE_VERSION=v1.32.3
 # renovate: datasource=github-releases depName=helm/helm
 ARG HELM_VERSION=v3.17.3
 # renovate: datasource=github-releases depName=getsops/sops
 ARG SOPS_VERSION=v3.10.2
-# renovate: datasource=github-releases depName=kubernetes-sigs/kustomize    =^kustomize\/(?<version>.+)$
+# renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize\/(?<version>.+)$
 ARG KUSTOMIZE_VERSION=v5.6.0
 
 ARG BUILD_OS
