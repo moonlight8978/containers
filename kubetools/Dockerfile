@@ -1,7 +1,7 @@
 FROM alpine:3.21.3 AS builder
 
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
-ARG KUBE_VERSION=v1.32.3
+ARG KUBE_VERSION=v1.33.1
 # renovate: datasource=github-releases depName=helm/helm
 ARG HELM_VERSION=v3.18.0
 # renovate: datasource=github-releases depName=getsops/sops
