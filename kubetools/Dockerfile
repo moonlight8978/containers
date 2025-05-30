@@ -1,4 +1,4 @@
-FROM alpine:3.21.3 AS builder
+FROM alpine:3.22.0 AS builder
 
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
 ARG KUBE_VERSION=v1.33.1
@@ -36,7 +36,7 @@ RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kust
     mv kustomize /app/bin/ && \
     rm kustomize.tar.gz
 
-FROM alpine:3.21.3
+FROM alpine:3.22.0
 
 RUN apk add --no-cache \
     # renovate: datasource=repology depName=alpine_3_21/gnupg versioning=loose
