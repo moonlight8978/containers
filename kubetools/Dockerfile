@@ -39,10 +39,12 @@ RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kust
 FROM alpine:3.22.0
 
 RUN apk add --no-cache \
-    # renovate: datasource=repology depName=alpine_3_21/gnupg versioning=loose
+    # renovate: datasource=repology depName=alpine_3_22/gnupg versioning=loose
     gnupg=2.4.7-r0 \
-    # renovate: datasource=repology depName=alpine_3_21/jq versioning=loose
-    jq=1.7.1-r0
+    # renovate: datasource=repology depName=alpine_3_22/jq versioning=loose
+    jq=1.8.0-r0 \
+    # renovate: datasource=repology depName=alpine_3_22/yq-go versioning=loose
+    yq-go=4.45.4-r0
 
 RUN adduser -u 1001 -D -S alpine
 USER alpine
