@@ -4,6 +4,7 @@ This repository contains a collection of Docker containers for various developme
 
 ## Available Containers
 
+- [hac-toolkit](./hac-toolkit/README.md) - Home Assistant Container Toolkit with encryption, templating, and automation tools
 - [kubetools](./kubetools/README.md) - Kubernetes toolkit container with common CLI tools for cluster management
 
 ## Usage

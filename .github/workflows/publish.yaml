@@ -14,6 +14,7 @@ jobs:
   init:
     runs-on: ubuntu-latest
     name: Initialize builds
+    if: ${{ contains(github.event.head_commit.message, 'dorelease') }}
     outputs:
       changed_containers: ${{ steps.changed_containers.outputs.containers }}
       changed: ${{ steps.changed_containers.outputs.changed }}

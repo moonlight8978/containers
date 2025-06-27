@@ -5,3 +5,10 @@ services:
       args:
         - BUILD_OS=linux
         - BUILD_ARCH=arm64
+
+  hac-toolkit:
+    build:
+      context: hac-toolkit
+      args:
+        BUILD_OS: linux
+        BUILD_ARCH: arm64
