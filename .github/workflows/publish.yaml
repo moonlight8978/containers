@@ -138,8 +138,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/${{ matrix.arch }}
-          provenance: false
-          sbom: false
           build-args: |
             BUILD_ARCH=${{ matrix.arch }}
             BUILD_OS=linux
