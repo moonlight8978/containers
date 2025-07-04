@@ -1,17 +1,9 @@
 services:
   kubetools:
-    build:
-      context: kubetools
-      args:
-        - BUILD_OS=linux
-        - BUILD_ARCH=arm64
+    build: kubetools
 
   hac-toolkit:
-    build:
-      context: hac-toolkit
-      args:
-        BUILD_OS: linux
-        BUILD_ARCH: arm64
+    build: hac-toolkit
 
   alpine:
     build: alpine
