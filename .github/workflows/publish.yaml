@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  BUILD_ARGS: "--test"
+  BUILD_ARGS: ""
   MONITORED_FILES: "config.yaml Dockerfile"
 
 jobs:
@@ -61,14 +61,12 @@ jobs:
 
   build:
     needs: init
-    # runs-on: ${{ contains(fromJson('["armhf", "armv7", "aarch64"]'), matrix.arch) && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     runs-on: ubuntu-latest
     if: needs.init.outputs.changed == 'true'
-    name: Build ${{ matrix.arch }} ${{ matrix.container }} container
+    name: Build ${{ matrix.container }} container
     strategy:
       matrix:
         container: ${{ fromJson(needs.init.outputs.changed_containers) }}
-        arch: ["amd64", "arm64"]
     permissions:
       contents: read
       packages: write
@@ -77,41 +75,23 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Get information
-        id: info
-        uses: home-assistant/actions/helpers/info@master
-        with:
-          path: "./${{ matrix.container }}"
+      - name: Install yq
+        run: sudo apt-get install -y yq
 
-      - name: Check if add-on should be built
-        id: check
+      - name: Get image info
+        id: info
         run: |
-          if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
-            echo "Image property is not defined, skipping build"
-            echo "build_arch=false" >> $GITHUB_OUTPUT;
-          elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
-            echo "build_arch=true" >> $GITHUB_OUTPUT;
-            echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
-            if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
-                echo "BUILD_ARGS=" >> $GITHUB_ENV;
-            fi
-          else
-            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.container }}, skipping build";
-            echo "build_arch=false" >> $GITHUB_OUTPUT;
-          fi
+          echo "image=$(yq -r ".image" ${{ matrix.container }}/config.yaml)" >> $GITHUB_OUTPUT
+          echo "platforms=$(yq -r ".platforms | join(\",\")" ${{ matrix.container }}/config.yaml)" >> $GITHUB_OUTPUT
+          echo "version=$(yq -r ".version" ${{ matrix.container }}/config.yaml)" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
-        if: env.BUILD_ARGS != '--test'
+        if: ${{ !contains(env.BUILD_ARGS, '--test') }}
         uses: docker/login-action@v3.4.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Unquote version
-        id: version
-        run: |
-          echo "value=${{ steps.info.outputs.version }}" | sed 's/^"\(.*\)"$/\1/' >> $GITHUB_OUTPUT
 
       - name: Create docker tags
         id: meta
@@ -119,7 +99,7 @@ jobs:
         with:
           images: ${{ steps.info.outputs.image }}
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.version.outputs.value }}
+            type=semver,pattern={{version}},value=${{ steps.info.outputs.version }}
 
       # Multi-arch build
       - name: Set up QEMU
@@ -129,7 +109,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Publish images
-        if: steps.check.outputs.build_arch == 'true'
         uses: docker/build-push-action@v6
         with:
           context: ./${{ matrix.container }}
@@ -137,7 +116,4 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/${{ matrix.arch }}
-          build-args: |
-            BUILD_ARCH=${{ matrix.arch }}
-            BUILD_OS=linux
+          platforms: ${{ steps.info.outputs.platforms }}

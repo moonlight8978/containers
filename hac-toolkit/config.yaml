@@ -1,5 +1,5 @@
 image: "ghcr.io/moonlight8978/homeassistant-container-toolkit"
-version: 1.0.2
-arch:
-  - amd64
-  - arm64
+version: 1.0.3
+platforms:
+  - linux/amd64
+  - linux/arm64

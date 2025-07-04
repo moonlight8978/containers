@@ -12,3 +12,6 @@ services:
       args:
         BUILD_OS: linux
         BUILD_ARCH: arm64
+
+  alpine:
+    build: alpine
