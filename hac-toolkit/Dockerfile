@@ -19,7 +19,7 @@ ARG AGE_VERSION=v1.2.1
 # renovate: datasource=github-releases depName=containrrr/shoutrrr
 ARG SHOUTRRR_VERSION=v0.8.0
 
-COPY --from=hairyhenderson/gomplate:v4.3.2-alpine /bin/gomplate /bin/gomplate
+COPY --from=hairyhenderson/gomplate:v4.3.3-alpine /bin/gomplate /bin/gomplate
 
 RUN curl -fSsL https://github.com/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.${TARGETOS}.${TARGETARCH} -o /bin/sops \
   && chmod +x /bin/sops
