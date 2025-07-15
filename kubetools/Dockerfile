@@ -1,4 +1,4 @@
-FROM alpine:3.22.0 AS builder
+FROM alpine:3.22.1 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -36,7 +36,7 @@ RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kust
     mv kustomize /app/bin/ && \
     rm kustomize.tar.gz
 
-FROM alpine:3.22.0
+FROM alpine:3.22.1
 
 RUN apk add --no-cache \
     # renovate: datasource=repology depName=alpine_3_22/gnupg versioning=loose
