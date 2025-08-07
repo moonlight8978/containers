@@ -10,3 +10,4 @@ services:
 
   kustomize-toolkit:
     build: kustomize-toolkit
+    platform: linux/amd64
