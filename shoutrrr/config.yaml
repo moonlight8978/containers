@@ -1,0 +1,5 @@
+image: "ghcr.io/moonlight8978/shoutrrr-alpine"
+version: 1.0.0
+platforms:
+  - linux/amd64
+  - linux/arm64
