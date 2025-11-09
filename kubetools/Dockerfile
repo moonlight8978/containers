@@ -10,7 +10,7 @@ ARG HELM_VERSION=v3.19.0
 # renovate: datasource=github-releases depName=getsops/sops
 ARG SOPS_VERSION=v3.11.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize\/(?<version>.+)$
-ARG KUSTOMIZE_VERSION=v5.7.1
+ARG KUSTOMIZE_VERSION=v5.8.0
 
 WORKDIR /app/bin
 
