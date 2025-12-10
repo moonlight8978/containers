@@ -4,7 +4,7 @@ ARG TARGETOS
 ARG TARGETARCH
 
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
-ARG KUBE_VERSION=v1.34.2
+ARG KUBE_VERSION=v1.34.3
 # renovate: datasource=github-releases depName=helm/helm
 ARG HELM_VERSION=v4.0.1
 # renovate: datasource=github-releases depName=getsops/sops
