@@ -15,7 +15,7 @@ RUN apk add --upgrade --no-cache \
 # renovate: datasource=github-releases depName=getsops/sops
 ARG SOPS_VERSION=v3.11.0
 # renovate: datasource=github-releases depName=FiloSottile/age
-ARG AGE_VERSION=v1.3.0
+ARG AGE_VERSION=v1.3.1
 # renovate: datasource=github-releases depName=containrrr/shoutrrr
 ARG SHOUTRRR_VERSION=v0.8.0
 
