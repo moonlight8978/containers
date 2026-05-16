@@ -6,7 +6,7 @@ ARG TARGETARCH
 # renovate: datasource=github-releases depName=helm/helm
 ARG HELM_VERSION=v4.2.0
 # renovate: datasource=github-releases depName=getsops/sops
-ARG SOPS_VERSION=v3.13.0
+ARG SOPS_VERSION=v3.13.1
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize\/(?<version>.+)$
 ARG KUSTOMIZE_VERSION=v5.8.1
 
