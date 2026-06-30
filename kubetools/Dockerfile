@@ -8,7 +8,7 @@ ARG KUBE_VERSION=v1.36.2
 # renovate: datasource=github-releases depName=helm/helm
 ARG HELM_VERSION=v4.2.2
 # renovate: datasource=github-releases depName=getsops/sops
-ARG SOPS_VERSION=v3.13.1
+ARG SOPS_VERSION=v3.13.2
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize extractVersion=^kustomize\/(?<version>.+)$
 ARG KUSTOMIZE_VERSION=v5.8.1
 
