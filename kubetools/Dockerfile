@@ -1,4 +1,4 @@
-FROM alpine:3.24.2 AS builder
+FROM alpine:3.24.3 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -36,7 +36,7 @@ RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kust
     mv kustomize /app/bin/ && \
     rm kustomize.tar.gz
 
-FROM alpine:3.24.2
+FROM alpine:3.24.3
 
 RUN apk add --no-cache \
     gnupg \
